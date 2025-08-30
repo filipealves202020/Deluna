@@ -345,3 +345,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicia a página na aba de pacotes
     document.getElementById('pacotes-tab-btn').click();
 });
+
