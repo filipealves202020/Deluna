@@ -570,6 +570,9 @@
         </div>
         <div id="gains" class="tab-content">
             <h2>Ganhos por Semana</h2>
+            <div class="button-group">
+                <button onclick="clearCache()">Limpar Cache</button>
+            </div>
             <div class="table-container">
                 <table class="gains-table">
                     <thead>
@@ -1292,6 +1295,15 @@
 
         function closeAlertPopup() {
             document.getElementById('alertPopupOverlay').style.display = 'none';
+        }
+        
+        // Função para limpar o cache (localStorage)
+        function clearCache() {
+            if (confirm('Tem certeza que deseja apagar TODOS os dados salvos localmente (registros, paradas e motoristas)?')) {
+                localStorage.clear();
+                alert('Cache limpo com sucesso! A página será recarregada.');
+                location.reload();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
