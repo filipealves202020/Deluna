@@ -572,6 +572,7 @@
             <h2>Ganhos por Semana</h2>
             <div class="button-group">
                 <button onclick="clearCache()">Limpar Cache</button>
+                <button onclick="clearServiceWorkerCache()">Limpar SW</button>
             </div>
             <div class="table-container">
                 <table class="gains-table">
@@ -1304,6 +1305,21 @@
                 alert('Cache limpo com sucesso! A página será recarregada.');
                 location.reload();
             }
+        }
+
+        // Função para limpar o cache do Service Worker
+        function clearServiceWorkerCache() {
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        return caches.delete(cacheName);
+                    })
+                );
+            }).then(() => {
+                alert('Cache do Service Worker limpo com sucesso!');
+            }).catch(error => {
+                console.error('Falha ao limpar o cache do Service Worker:', error);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
