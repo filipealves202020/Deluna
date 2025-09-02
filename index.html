@@ -10,20 +10,144 @@
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
     
     <style>
+        /* Variável CSS para o tamanho da fonte dos números do teclado. */
+        :root {
+            --keypad-font-size: 36px;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #121212;
             color: #e0e0e0;
             margin: 0;
             padding: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
+        
+        /* Estilos do Tema Claro com 3 tons de cinza */
+        body.light-theme {
+            background-color: #f0f0f0; /* Fundo geral: cinza claro */
+            color: #333;
+        }
+        body.light-theme .container {
+            background-color: #f0f0f0; /* Fundo do container principal: cinza claro */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .logo { filter: invert(0); }
+        body.light-theme h1, body.light-theme h2 { color: #333; }
+        body.light-theme .tab-button {
+            background-color: #C9E6E6; /* Cor verde-azulado mais clara para abas inativas */
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        body.light-theme .tab-button.active {
+            background-color: #008080; /* Verde-azulado */
+            color: white;
+            border-color: #008080; /* Verde-azulado */
+        }
+        body.light-theme input, body.light-theme select, body.light-theme button {
+            background-color: #e9e9e9; /* Tom 3 - Fundo dos campos de entrada, seleção e botões */
+            color: #333;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme button { 
+            background-color: #008080; /* Verde-azulado */
+            color: white; 
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+        }
+        body.light-theme button:hover {
+            background-color: #006666;
+        }
+        body.light-theme .total-container { background-color: #e9e9e9; } /* Tom 3 */
+        body.light-theme .total-info { color: #555; }
+        body.light-theme .table-container { background-color: #e0e0e0; } /* Fundo da tabela cinza */
+        
+        /* Adicionando sombreamento a todas as tabelas no tema claro */
+        body.light-theme table,
+        body.light-theme #stopsTable,
+        body.light-theme #recordsTable,
+        body.light-theme .gains-table { 
+            background-color: #e0e0e0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Efeito de sombreamento */
+        }
+        
+        body.light-theme th { background-color: #008080; } /* Verde-azulado */
+        body.light-theme td { color: #333; border-bottom: 1px solid #ddd; }
+        body.light-theme .observation-field { 
+            background-color: #e9e9e9; 
+            color: #333; 
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .filled-observation { background-color: #ffe8e8; }
+        body.light-theme .stop-row.completed { background-color: #d4edda; }
+        body.light-theme .stop-row.completed td { color: #666; }
+        body.light-theme .custom-popup-overlay .custom-popup-content, 
+        body.light-theme .numeric-keyboard button,
+        body.light-theme .observation-popup-content {
+            background-color: #F0F0F0;
+            color: #333;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .custom-popup-content h3 {
+            color: #333;
+        }
+        body.light-theme .numeric-input,
+        body.light-theme .observation-popup-content textarea {
+            background-color: #e9e9e9; 
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .numeric-keyboard .numeric-key {
+            background-color: #e0e0e0; /* Tom 3 */
+        }
+        body.light-theme .numeric-keyboard .numeric-key:hover {
+            background-color: #008080; /* Verde-azulado */
+        }
+        body.light-theme .observation-options button {
+            background-color: #e9e9e9;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        body.light-theme .week-total-row {
+            background-color: #A8C5E7; /* Fundo azul claro para o total da semana no tema claro */
+            color: #333;
+        }
+        body.light-theme .gains-value-cell {
+            color: #008080;
+        }
+        body.light-theme .gains-table th, 
+        body.light-theme .gains-table td {
+            border: 1px solid #bbb; /* Corrigido: Bordas mais visíveis para o tema claro */
+        }
+        body.light-theme #gainsByMonthPopupContent h3 {
+            color: #333;
+        }
+        body.light-theme #gainsByMonthPopupContent th {
+            background-color: #ccc;
+            color: #333;
+        }
+        body.light-theme #gainsByMonthPopupContent td {
+            color: #333;
+        }
+        body.light-theme .settings-content button {
+            background-color: #008080; /* Verde-azulado */
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos do Tema Escuro com 3 tons de cinza */
         .container {
             max-width: 900px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #1e1e1e;
+            background-color: #1e1e1e; /* Tom 2 - Fundo do container principal */
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
         .logo {
             display: block;
@@ -49,7 +173,7 @@
             margin-bottom: 20px;
         }
         .tab-button {
-            background-color: #2a2a2a;
+            background-color: #2a2a2a; /* Tom 3 - Fundo dos botões de aba inativos */
             border: 1px solid #444;
             border-bottom: none;
             padding: 10px 20px;
@@ -57,11 +181,12 @@
             font-size: 16px;
             border-radius: 5px 5px 0 0;
             color: #e0e0e0;
+            transition: background-color 0.3s, color 0.3s;
         }
         .tab-button.active {
-            background-color: #3e5c9b;
+            background-color: #008080; /* Verde-azulado */
             color: white;
-            border-color: #3e5c9b;
+            border-color: #008080; /* Verde-azulado */
         }
         .tab-content {
             display: none;
@@ -79,24 +204,27 @@
         .form-paradas {
             justify-content: flex-start;
         }
-        input, button {
+        input, button, select {
             flex: 1;
             padding: 12px;
             border: 1px solid #444;
             border-radius: 5px;
             font-size: 16px;
-            background-color: #2a2a2a;
+            background-color: #2a2a2a; /* Tom 3 - Fundo dos campos de entrada e seleção */
             color: #e0e0e0;
+            transition: background-color 0.3s, color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         button {
-            background-color: #3e5c9b;
+            background-color: #008080; /* Verde-azulado */
             color: white;
             border: none;
             cursor: pointer;
             transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         button:hover {
-            background-color: #4b68a7;
+            background-color: #006666;
         }
         .form-paradas input {
             max-width: none;
@@ -108,18 +236,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #2a2a2a;
+            background-color: #2a2a2a; /* Tom 3 */
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .total-info {
             font-size: 1.2em;
             font-weight: bold;
             color: #e0e0e0;
+            transition: color 0.3s;
         }
         .total-value {
-            color: #6a9bd2;
+            color: #008080; /* Verde-azulado */
         }
         .total-insucesso {
             color: #dc3545;
@@ -127,11 +258,18 @@
         .table-container {
             overflow-x: auto;
         }
-        table {
+        
+        /* Adicionando sombreamento a todas as tabelas no tema escuro */
+        table,
+        #stopsTable,
+        #recordsTable,
+        .gains-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         }
+        
         th, td {
             padding: 8px;
             border-bottom: 1px solid #444;
@@ -139,7 +277,7 @@
             vertical-align: top;
         }
         th {
-            background-color: #3e5c9b;
+            background-color: #008080; /* Verde-azulado */
             color: white;
             position: sticky;
             top: 0;
@@ -179,10 +317,10 @@
             font-weight: bold;
         }
         .add-btn {
-            background-color: #28a745;
+            background-color: #008080; /* Verde-azulado */
         }
         .edit-btn {
-            background-color: #007bff;
+            background-color: #008080; /* Verde-azulado */
         }
         .delete-btn {
             background-color: #dc3545;
@@ -203,6 +341,7 @@
             font-family: Arial, sans-serif;
             resize: vertical;
             transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .filled-observation {
             background-color: #4a2c2c;
@@ -289,7 +428,7 @@
             overflow-y: auto;
         }
         .custom-popup-details h3, .custom-popup-details h4 {
-            color: #3e5c9b;
+            color: #008080; /* Verde-azulado */
             margin: 10px 0 5px;
         }
         .custom-popup-details p {
@@ -297,7 +436,7 @@
             margin: 5px 0;
         }
         .custom-popup-details .value {
-            color: #6a9bd2;
+            color: #008080; /* Verde-azulado */
             font-weight: bold;
         }
         .custom-popup-details ul {
@@ -317,11 +456,11 @@
         }
         .gains-table th, .gains-table td {
             padding: 8px;
-            border: 1px solid #444;
+            border: 1px solid #444; /* Corrigido: bordas mais finas */
             text-align: left;
         }
         .gains-table th {
-            background-color: #3e5c9b;
+            background-color: #008080; /* Verde-azulado */
             color: white;
             position: sticky;
             top: 0;
@@ -329,7 +468,7 @@
         .gains-table .week-total-row {
             background-color: #2a2a2a;
             font-weight: bold;
-            color: #6a9bd2;
+            color: #008080; /* Verde-azulado */
         }
         /* Estilos para o pop-up de observações */
         .observation-popup {
@@ -371,9 +510,10 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .observation-options button:hover {
-            background-color: #3e5c9b;
+            background-color: #008080; /* Verde-azulado */
         }
         .observation-popup-content textarea {
             width: 100%;
@@ -387,16 +527,17 @@
             font-family: Arial, sans-serif;
             resize: vertical;
             margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .observation-popup-actions {
             display: flex;
             justify-content: space-around;
             gap: 10px;
         }
-        /* Estilos para o botão de fechar do pop-up de foto */
+        /* Estilos para o botão de fechar do pop-up de foto e teclado */
         .close-btn {
             position: absolute;
-            bottom: 10px;
+            top: 10px;
             right: 10px;
             background-color: #dc3545;
             color: white;
@@ -425,6 +566,7 @@
             border: 1px solid #444;
             border-radius: 5px;
             margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .numeric-keyboard {
             display: grid;
@@ -433,8 +575,8 @@
             margin-bottom: 15px;
         }
         .numeric-keyboard button {
-            padding: 15px;
-            font-size: 18px;
+            padding: 25px;
+            font-weight: bold;
             background-color: #2a2a2a;
             color: #e0e0e0;
             border: 1px solid #444;
@@ -443,21 +585,11 @@
             transition: background-color 0.2s;
         }
         .numeric-keyboard button:hover {
-            background-color: #3e5c9b;
+            background-color: #008080; /* Verde-azulado */
         }
-        .numeric-keyboard button:nth-child(11) {
-            /* Botão Apagar */
-            background-color: #dc3545;
-        }
-        .numeric-keyboard button:nth-child(11):hover {
-            background-color: #c82333;
-        }
-        .numeric-keyboard button:nth-child(12) {
-            /* Botão Confirmar */
-            background-color: #28a745;
-        }
-        .numeric-keyboard button:nth-child(12):hover {
-            background-color: #218838;
+        /* Alteração para aplicar a fonte APENAS aos números */
+        .numeric-keyboard .numeric-key {
+            font-size: var(--keypad-font-size);
         }
         .alert-popup-content h3 {
             color: #dc3545;
@@ -473,6 +605,117 @@
         }
         .alert-popup-content button:hover {
             background-color: #c82333;
+        }
+        /* Estilos para o novo pop-up de ganhos por mês */
+        #gainsByMonthPopupOverlay {
+            text-align: left;
+        }
+        #gainsByMonthPopupContent h3 {
+            text-align: center;
+            color: #fff;
+        }
+        #gainsByMonthPopupContent table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #gainsByMonthPopupContent th,
+        #gainsByMonthPopupContent td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: left;
+            font-size: 1em;
+        }
+        #gainsByMonthPopupContent th {
+            background-color: #333;
+            color: white;
+        }
+        #gainsByMonthPopupContent td {
+            color: #e0e0e0;
+        }
+        #gainsByMonthPopupContent .gains-value-cell {
+            color: #008080; /* Verde-azulado */
+            font-weight: bold;
+        }
+        #gainsByMonthPopupContent button {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #008080; /* Verde-azulado */
+        }
+        /* Estilos para o popup de configurações */
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+        }
+        .setting-label {
+            font-size: 1.1em;
+            color: #e0e0e0;
+            white-space: nowrap;
+        }
+        /* Estilos para o slider de tema */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #008080; /* Verde-azulado */
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .font-size-value {
+            min-width: 30px;
+            text-align: right;
+        }
+        .last-cache-date {
+            font-style: italic;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        /* Alinhamento da coluna de ganhos para a direita */
+        .gains-table th:last-child,
+        .gains-table td:last-child {
+            text-align: right;
         }
         @media (max-width: 600px) {
             .company-name { font-size: 1.4em; }
@@ -493,8 +736,10 @@
             #stopsTable th:nth-child(5), #stopsTable td:nth-child(5) { width: auto; }
             .edit-btn, .delete-btn, .add-btn { padding: 4px 6px; font-size: 10px; }
             .numeric-keyboard button {
-                padding: 10px;
-                font-size: 16px;
+                padding: 15px;
+            }
+            .numeric-keyboard .numeric-key {
+                font-size: var(--keypad-font-size);
             }
         }
     </style>
@@ -514,9 +759,7 @@
                 <input type="text" id="quantity-paradas" placeholder="Quantidade de Pacotes" readonly required>
                 <button id="saveStopBtn" onclick="saveStopRecord()">Salvar Parada</button>
             </div>
-            <div class="button-group">
-                <button id="finishRouteBtn" onclick="finishRoute()">Finalizar Rota</button>
-            </div>
+            
             <div class="total-container">
                 <div class="total-info">Quantidade total: <span id="totalStopsCount" class="total-value">0</span></div>
             </div>
@@ -545,9 +788,7 @@
                 <button onclick="addOrUpdateRecord()">Adicionar</button>
             </div>
             <div class="button-group">
-                <button onclick="exportData()">Exportar Dados</button>
-                <button onclick="document.getElementById('file-input').click()">Importar Dados</button>
-                <input type="file" id="file-input" accept=".json" class="hidden-file-input" onchange="importData(event)">
+                <button id="finishRouteBtn" onclick="finishRoute()">Finalizar Rota</button>
             </div>
             <div class="total-container">
                 <input type="date" id="total-date-filter">
@@ -570,9 +811,25 @@
         </div>
         <div id="gains" class="tab-content">
             <h2>Ganhos por Semana</h2>
-            <div class="button-group">
-                <button onclick="clearCache()">Limpar Cache</button>
-                <button onclick="clearServiceWorkerCache()">Limpar SW</button>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <select id="month-filter">
+                    <option value="">Todos os Meses</option>
+                    <option value="0">Janeiro</option>
+                    <option value="1">Fevereiro</option>
+                    <option value="2">Março</option>
+                    <option value="3">Abril</option>
+                    <option value="4">Maio</option>
+                    <option value="5">Junho</option>
+                    <option value="6">Julho</option>
+                    <option value="7">Agosto</option>
+                    <option value="8">Setembro</option>
+                    <option value="9">Outubro</option>
+                    <option value="10">Novembro</option>
+                    <option value="11">Dezembro</option>
+                </select>
+                <select id="year-filter">
+                    <option value="">Todos os Anos</option>
+                </select>
             </div>
             <div class="table-container">
                 <table class="gains-table">
@@ -608,6 +865,9 @@
             </div>
             <button onclick="hideRouteDetails()">Voltar</button>
         </div>
+        <div class="button-group" style="justify-content: center; margin-top: 20px;">
+            <button onclick="openSettingsPopup()">Configurações</button>
+        </div>
     </div>
     
     <div id="customPopupOverlay" class="custom-popup-overlay">
@@ -619,6 +879,37 @@
                     <button onclick="closeCustomPopup()">Fechar</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="gainsByMonthPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <div id="gainsByMonthPopupContent">
+                <h3 id="gainsPopupTitle"></h3>
+                <table class="gains-table">
+                    <thead>
+                        <tr>
+                            <th>Quinzena</th>
+                            <th>Ganhos (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gainsPopupTableBody">
+                        <tr>
+                            <td>1ª Quinzena</td>
+                            <td id="firstHalfGains" class="gains-value-cell"></td>
+                        </tr>
+                        <tr>
+                            <td>2ª Quinzena</td>
+                            <td id="secondHalfGains" class="gains-value-cell"></td>
+                        </tr>
+                        <tr>
+                            <td>Total do Mês</td>
+                            <td id="totalMonthGains" class="gains-value-cell"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button onclick="closeGainsPopup()">Fechar</button>
         </div>
     </div>
 
@@ -644,33 +935,89 @@
         </div>
     </div>
 
-    <div id="numericKeyboardPopup" class="custom-popup-overlay" style="display: none;">
+    <div id="numericKeyboardPopup" class="custom-popup-overlay">
         <div class="custom-popup-content">
-            <h3 id="numericKeyboardTitle">Digite o Número</h3>
+            <h3 id="numericKeyboardTitle" style="color: #fff;">Digite o Número</h3>
+            <span class="close-btn" onclick="closeNumericKeyboard()">X</span>
             <input type="text" id="numericInput" readonly class="numeric-input" value="0">
             <div class="numeric-keyboard">
-                <button onclick="addNumericKey('1')">1</button>
-                <button onclick="addNumericKey('2')">2</button>
-                <button onclick="addNumericKey('3')">3</button>
-                <button onclick="addNumericKey('4')">4</button>
-                <button onclick="addNumericKey('5')">5</button>
-                <button onclick="addNumericKey('6')">6</button>
-                <button onclick="addNumericKey('7')">7</button>
-                <button onclick="addNumericKey('8')">8</button>
-                <button onclick="addNumericKey('9')">9</button>
-                <button onclick="addNumericKey('0')">0</button>
-                <button onclick="clearNumericInput()">Apagar</button>
-                <button onclick="confirmNumericInput()">Confirmar</button>
+                <button class="numeric-key" onclick="addNumericKey('1')">1</button>
+                <button class="numeric-key" onclick="addNumericKey('2')">2</button>
+                <button class="numeric-key" onclick="addNumericKey('3')">3</button>
+                <button class="numeric-key" onclick="addNumericKey('4')">4</button>
+                <button class="numeric-key" onclick="addNumericKey('5')">5</button>
+                <button class="numeric-key" onclick="addNumericKey('6')">6</button>
+                <button class="numeric-key" onclick="addNumericKey('7')">7</button>
+                <button class="numeric-key" onclick="addNumericKey('8')">8</button>
+                <button class="numeric-key" onclick="addNumericKey('9')">9</button>
+                <button onclick="clearNumericInput()" style="background-color: #dc3545;">Apagar</button>
+                <button class="numeric-key" onclick="addNumericKey('0')">0</button>
+                <button onclick="confirmNumericInput()" style="background-color: #008080;">Confirmar</button>
             </div>
-            <span class="close-btn" onclick="closeNumericKeyboard()">X</span>
         </div>
     </div>
 
-    <div id="alertPopupOverlay" class="custom-popup-overlay" style="display: none;">
+    <div id="alertPopupOverlay" class="custom-popup-overlay">
         <div class="custom-popup-content alert-popup-content">
             <h3>Atenção!</h3>
             <p id="alertMessage"></p>
             <button onclick="closeAlertPopup()">OK</button>
+        </div>
+    </div>
+
+    <div id="settingsPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <h3>Configurações</h3>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <span class="setting-label">Tema Escuro/Claro</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Tamanho da Fonte do Teclado:</span>
+                    <select id="fontSizeSelect">
+                        <option value="15">15px</option>
+                        <option value="16">16px</option>
+                        <option value="17">17px</option>
+                        <option value="18">18px</option>
+                        <option value="19">19px</option>
+                        <option value="20">20px</option>
+                        <option value="21">21px</option>
+                        <option value="22">22px</option>
+                        <option value="23">23px</option>
+                        <option value="24">24px</option>
+                        <option value="25">25px</option>
+                        <option value="26">26px</option>
+                        <option value="27">27px</option>
+                        <option value="28">28px</option>
+                        <option value="29">29px</option>
+                        <option value="30">30px</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Dados:</span>
+                    <div class="button-group" style="width: 100%; margin-top: 10px;">
+                        <button onclick="exportData()">Exportar Dados</button>
+                        <button onclick="document.getElementById('file-input').click()">Importar Dados</button>
+                    </div>
+                    <input type="file" id="file-input" accept=".json" class="hidden-file-input" onchange="importData(event)">
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Manutenção:</span>
+                    <div class="button-group" style="width: 100%; margin-top: 10px;">
+                        <button onclick="clearCache()">Limpar Cache</button>
+                        <button onclick="clearServiceWorkerCache()">Limpar SW</button>
+                    </div>
+                </div>
+                <div class="setting-item" style="flex-direction: column; align-items: flex-start;">
+                    <span class="setting-label">Último Salvamento:</span>
+                    <span id="lastCacheDate" class="last-cache-date">Nenhum dado salvo.</span>
+                </div>
+            </div>
+            <button onclick="closeSettingsPopup()" style="margin-top: 20px;">Fechar</button>
         </div>
     </div>
 
@@ -693,6 +1040,12 @@
         const tabNames = ['paradas', 'pacotes', 'gains'];
 
         function openTab(tabName, tabIndex) {
+            // Se a aba anterior era a de ganhos, resetamos o filtro de mês
+            if (tabNames[currentTabIndex] === 'gains') {
+                document.getElementById('month-filter').value = '';
+                document.getElementById('gainsTableBody').innerHTML = '';
+            }
+
             const tabContents = document.querySelectorAll('.tab-content');
             tabContents.forEach(tab => tab.classList.remove('active'));
             const tabButtons = document.querySelectorAll('.tab-button');
@@ -813,6 +1166,8 @@
             localStorage.setItem('records', JSON.stringify(records));
             loadRecords();
             clearFormPacotes();
+            // Salva a data do último cache
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
         }
 
         function editRecord(index) {
@@ -886,6 +1241,8 @@
             localStorage.setItem('stops', JSON.stringify(stops));
             loadStopRecords();
             clearFormParadas();
+            // Salva a data do último cache
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
         }
 
         function loadStopRecords() {
@@ -931,6 +1288,8 @@
                 stops[index].photo = reader.result;
                 localStorage.setItem('stops', JSON.stringify(stops));
                 loadStopRecords();
+                // Salva a data do último cache
+                localStorage.setItem('lastCacheDate', new Date().toISOString());
             };
             reader.readAsDataURL(file);
         }
@@ -963,6 +1322,7 @@
                 stops[currentObservationIndex].observations = newObservation;
                 localStorage.setItem('stops', JSON.stringify(stops));
                 loadStopRecords();
+                localStorage.setItem('lastCacheDate', new Date().toISOString());
             }
             closeObservationPopup();
         }
@@ -983,7 +1343,7 @@
             document.getElementById('stopNumber').value = record.stopNumber;
             document.getElementById('quantity-paradas').value = record.quantity;
             editStopIndex = index;
-            document.getElementById('saveStopBtn').textContent = 'Atualizar Parada';
+            document.getElementById('saveStopBtn').textContent = 'Salvar Parada';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1034,6 +1394,7 @@
             loadRecords();
             loadStopRecords();
             showAlert(`A rota "${routeName}" foi finalizada e os dados de paradas foram salvos.`);
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
         }
 
         function showRouteDetails(date, route) {
@@ -1121,6 +1482,7 @@
                         loadRecords();
                         loadStopRecords();
                         showAlert('Dados importados com sucesso!');
+                        localStorage.setItem('lastCacheDate', new Date().toISOString());
                     } else {
                         showAlert('Formato de arquivo JSON inválido. Por favor, selecione um arquivo válido.');
                     }
@@ -1141,28 +1503,67 @@
             document.getElementById('customPopupOverlay').style.display = 'none';
         }
 
+        function openGainsPopup() {
+            document.getElementById('gainsByMonthPopupOverlay').style.display = 'flex';
+        }
+
+        function closeGainsPopup() {
+            document.getElementById('gainsByMonthPopupOverlay').style.display = 'none';
+        }
+
         function getWeekStartDate(date) {
             const d = new Date(date + 'T00:00:00');
             const dayOfWeek = d.getDay();
             const diff = d.getDate() - dayOfWeek;
             return new Date(d.setDate(diff)).toISOString().slice(0, 10);
         }
-
+        
         function updateGainsTable() {
             const tableBody = document.getElementById('gainsTableBody');
             tableBody.innerHTML = '';
             
-            const dailyTotals = {};
-            records.forEach(record => {
-                if (!dailyTotals[record.date]) {
-                    dailyTotals[record.date] = { packages: 0, gains: 0 };
-                }
-                const packages = record.quantity;
-                const gains = packages * 2.50;
-                dailyTotals[record.date].packages += packages;
-                dailyTotals[record.date].gains += gains;
-            });
+            const selectedMonth = document.getElementById('month-filter').value;
+            const selectedYear = document.getElementById('year-filter').value;
             
+            const yearFilter = document.getElementById('year-filter');
+            if (yearFilter.options.length <= 1) {
+                const uniqueYears = [...new Set(records.map(r => new Date(r.date).getFullYear()))].sort((a, b) => b - a);
+                uniqueYears.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearFilter.appendChild(option);
+                });
+                yearFilter.value = new Date().getFullYear();
+            }
+
+            const dailyTotals = {};
+
+            records.forEach(record => {
+                const recordDate = new Date(record.date + 'T00:00:00');
+                const recordMonth = recordDate.getMonth();
+                const recordYear = recordDate.getFullYear();
+                
+                const monthMatch = selectedMonth === '' || recordMonth === parseInt(selectedMonth);
+                const yearMatch = selectedYear === '' || recordYear === parseInt(selectedYear);
+
+                if (monthMatch && yearMatch) {
+                    if (!dailyTotals[record.date]) {
+                        dailyTotals[record.date] = { packages: 0, gains: 0 };
+                    }
+                    const packages = record.quantity;
+                    const gains = packages * 2.50;
+                    dailyTotals[record.date].packages += packages;
+                    dailyTotals[record.date].gains += gains;
+                }
+            });
+
+            if (selectedMonth !== '' && selectedYear !== '') {
+                showGainsByMonthPopup(selectedMonth, selectedYear, dailyTotals);
+            } else {
+                closeGainsPopup();
+            }
+
             const weeklyGains = {};
             Object.keys(dailyTotals).forEach(dateString => {
                 const weekKey = getWeekStartDate(dateString);
@@ -1189,7 +1590,7 @@
                     dayRow.innerHTML = `
                         <td>${formatDate(day.date)}</td>
                         <td>${day.packages}</td>
-                        <td>R$ ${day.gains.toFixed(2).replace('.', ',')}</td>
+                        <td class="gains-value-cell">R$ ${day.gains.toFixed(2).replace('.', ',')}</td>
                     `;
                     tableBody.appendChild(dayRow);
                 });
@@ -1205,9 +1606,36 @@
             });
         }
 
+        function showGainsByMonthPopup(monthIndex, year, dailyTotals) {
+            const monthName = document.querySelector(`#month-filter option[value='${monthIndex}']`).textContent;
+            document.getElementById('gainsPopupTitle').textContent = `Ganhos em ${monthName} de ${year}`;
+            
+            let firstHalfGains = 0;
+            let secondHalfGains = 0;
+            let totalMonthGains = 0;
+
+            Object.keys(dailyTotals).forEach(dateString => {
+                const day = new Date(dateString + 'T00:00:00').getDate();
+                const gains = dailyTotals[dateString].gains;
+                
+                if (day <= 15) {
+                    firstHalfGains += gains;
+                } else {
+                    secondHalfGains += gains;
+                }
+                totalMonthGains += gains;
+            });
+
+            document.getElementById('firstHalfGains').textContent = `R$ ${firstHalfGains.toFixed(2).replace('.', ',')}`;
+            document.getElementById('secondHalfGains').textContent = `R$ ${secondHalfGains.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalMonthGains').textContent = `R$ ${totalMonthGains.toFixed(2).replace('.', ',')}`;
+
+            openGainsPopup();
+        }
+
         // Funções para o teclado numérico
         let currentNumericValue = '';
-        let currentInputField = ''; // Rastreia qual campo está sendo editado ('stopNumber' ou 'quantity-paradas')
+        let currentInputField = '';
 
         function openNumericKeyboard(fieldId) {
             currentInputField = fieldId;
@@ -1236,10 +1664,8 @@
             document.getElementById(currentInputField).value = value;
             
             if (currentInputField === 'stopNumber') {
-                // Após confirmar o número da parada, foca no campo de quantidade
                 openNumericKeyboard('quantity-paradas');
             } else if (currentInputField === 'quantity-paradas') {
-                // Após confirmar a quantidade, salva o registro automaticamente
                 saveStopRecord();
                 closeNumericKeyboard();
                 document.getElementById('stopNumber').focus();
@@ -1322,6 +1748,22 @@
             });
         }
 
+        // Funções para o novo pop-up de configurações
+        function openSettingsPopup() {
+            const lastCacheDate = localStorage.getItem('lastCacheDate');
+            if (lastCacheDate) {
+                const date = new Date(lastCacheDate);
+                document.getElementById('lastCacheDate').textContent = date.toLocaleString('pt-BR');
+            } else {
+                document.getElementById('lastCacheDate').textContent = 'Nenhum dado salvo.';
+            }
+            document.getElementById('settingsPopupOverlay').style.display = 'flex';
+        }
+
+        function closeSettingsPopup() {
+            document.getElementById('settingsPopupOverlay').style.display = 'none';
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toLocaleDateString('en-CA');
             document.getElementById('total-date-filter').value = today;
@@ -1358,6 +1800,54 @@
 
             document.getElementById('quantity-paradas').addEventListener('keydown', (event) => {
                 event.preventDefault();
+            });
+
+            // Adiciona os event listeners para os novos filtros
+            document.getElementById('month-filter').addEventListener('change', updateGainsTable);
+            document.getElementById('year-filter').addEventListener('change', updateGainsTable);
+
+            // Novo: Lógica de configuração
+            const themeToggle = document.getElementById('theme-toggle');
+            // Alterado para a caixa de seleção
+            const fontSizeSelect = document.getElementById('fontSizeSelect');
+
+            // Carrega as configurações salvas no localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeToggle.checked = true;
+            }
+
+            const savedFontSize = localStorage.getItem('keypadFontSize');
+            if (savedFontSize) {
+                document.documentElement.style.setProperty('--keypad-font-size', `${savedFontSize}px`);
+                fontSizeSelect.value = savedFontSize;
+            } else {
+                // Se não houver tamanho salvo, usa o valor padrão de 24px
+                localStorage.setItem('keypadFontSize', '24');
+                document.documentElement.style.setProperty('--keypad-font-size', '24px');
+                fontSizeSelect.value = '24';
+            }
+
+            // Salva a data de carregamento inicial
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
+
+            // Event listener para o tema
+            themeToggle.addEventListener('change', () => {
+                if (themeToggle.checked) {
+                    document.body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+
+            // Event listener para a seleção do tamanho da fonte
+            fontSizeSelect.addEventListener('change', (event) => {
+                const newSize = event.target.value;
+                document.documentElement.style.setProperty('--keypad-font-size', `${newSize}px`);
+                localStorage.setItem('keypadFontSize', newSize);
             });
         });
     </script>
