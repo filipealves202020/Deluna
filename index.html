@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Pacotes e Paradas - ML Deluna</title>
+    
+    <meta name="theme-color" content="#3e5c9b">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha20a-H204h/h204h"
+        crossorigin=""/>
+    <style>
+        /* Variável CSS para o tamanho da fonte dos números do teclado. */
+        :root {
+            --keypad-font-size: 36px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+            background-image: url("IMG_20250904_132819.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        .top-logo {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Estilos do Tema Claro com 3 tons de cinza */
+        body.light-theme {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        body.light-theme .container {
+            background-color: rgba(240, 240, 240, 0.6); 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        body.light-theme .logo { filter: invert(0); }
+        body.light-theme h1, body.light-theme h2 { color: #333; }
+        body.light-theme .tab-button {
+            background-color: #C9E6E6;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        body.light-theme .tab-button.active {
+            background-color: #008080;
+            color: white;
+            border-color: #008080;
+        }
+        body.light-theme input, body.light-theme select {
+            background-color: #e9e9e9;
+            color: #333;
+            border: 1px solid #000000; /* Alterado para preto */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        body.light-theme button { 
+            background-color: #008080;
+            color: white; 
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme button:hover {
+            background-color: #006666;
+        }
+        body.light-theme .total-container { background-color: #e9e9e9; }
+        body.light-theme .total-info { color: #555; }
+        body.light-theme .table-container { background-color: #e0e0e0; }
+        body.light-theme table,
+        body.light-theme #stopsTable,
+        body.light-theme #recordsTable,
+        body.light-theme #completedStopsTable,
+        body.light-theme .gains-table { 
+            background-color: #e0e0e0;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        body.light-theme #completedStopsTable {
+            background-color: #90b8b8;
+        }
+        body.light-theme th { background-color: #008080; }
+        body.light-theme td { color: #333; border-bottom: 1px solid #ddd; }
+        body.light-theme .observation-field { 
+            background-color: #e9e9e9; 
+            color: #333; 
+            border: 1px solid #000000; /* Alterado para preto */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .filled-observation { background-color: #ffe8e8; }
+        body.light-theme .stop-row.completed { background-color: #d4edda; }
+        body.light-theme .stop-row.completed td { color: #666; }
+        body.light-theme .custom-popup-overlay .custom-popup-content, 
+        body.light-theme .numeric-keyboard button,
+        body.light-theme .observation-popup-content,
+        body.light-theme #map {
+            background-color: #F0F0F0;
+            color: #333;
+            border: 1px solid #ccc;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        body.light-theme .numeric-keyboard button {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        body.light-theme .numeric-keyboard .numeric-key:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        body.light-theme .custom-popup-content h3 {
+            color: #333;
+        }
+        body.light-theme .numeric-input,
+        body.light-theme .observation-popup-content textarea,
+        body.light-theme .observation-popup-content input {
+            background-color: #e9e9e9; 
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #000000; /* Alterado para preto */
+        }
+        body.light-theme .numeric-keyboard .numeric-key {
+            background-color: #e0e0e0;
+        }
+        body.light-theme .numeric-keyboard .numeric-key:hover {
+            background-color: #008080;
+        }
+        body.light-theme .observation-options button {
+            background-color: #e9e9e9;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        body.light-theme .week-total-row {
+            background-color: #008080;
+            color: white;
+        }
+        
+        body.light-theme .gains-value-cell {
+            color: #000000;
+        }
+        body.light-theme .gains-table th, 
+        body.light-theme .gains-table td {
+            border: 1px solid #bbb;
+        }
+        body.light-theme #gainsByMonthPopupContent h3 {
+            color: #333;
+        }
+        body.light-theme #gainsByMonthPopupContent th {
+            background-color: #ccc;
+            color: #333;
+        }
+        body.light-theme #gainsByMonthPopupContent td {
+            color: #333;
+        }
+        body.light-theme .settings-content button {
+            background-color: #008080;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .alert-popup-content p,
+        body.light-theme .custom-popup-content p {
+            color: #333;
+        }
+        body.light-theme .observation-popup-content h3 {
+            color: #333;
+        }
+        
+        body.light-theme .map-text {
+            color: #000; /* Alteração: Escurece a palavra Mapa */
+        }
+
+        /* Estilos do Tema Escuro com 3 tons de cinza */
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(30, 30, 30, 0.6); 
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4); /* Alteração: Sombra branca */
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 10px;
+            width: 250px;
+            max-width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        h2 {
+            text-align: center;
+            color: #ffffff;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-bottom: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px 5px 0 0;
+            color: #e0e0e0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #008080;
+            color: white;
+            border-color: #008080;
+        }
+        .tab-content {
+            display: none;
+            padding-top: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .form-paradas {
+            justify-content: flex-start;
+        }
+        input, button, select {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            transition: background-color 0.3s, color 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+
+        /* Borda preta nos campos de entrada da aba de paradas */
+        #stopNumber, #quantity-paradas {
+            border: 1px solid #000000;
+        }
+        
+        /* Borda preta nos campos de observação */
+        .observation-field {
+            border: 1px solid #000000;
+        }
+        
+        button {
+            background-color: #008080;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        button:hover {
+            background-color: #006666;
+        }
+        .form-paradas input {
+            max-width: none;
+        }
+        .form-paradas button {
+            max-width: none;
+        }
+        .total-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .total-info {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e0e0e0;
+            transition: color 0.3s;
+        }
+        .total-value {
+            color: #008080;
+        }
+        .total-insucesso {
+            color: #dc3545;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table,
+        #stopsTable,
+        #recordsTable,
+        #completedStopsTable,
+        .gains-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4); /* Alteração: Sombra branca */
+        }
+        
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #444;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #008080;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        #recordsTable th:nth-child(1),
+        #recordsTable td:nth-child(1) { width: 20%; }
+        #recordsTable th:nth-child(2),
+        #recordsTable td:nth-child(2) { width: 15%; }
+        #recordsTable th:nth-child(3),
+        #recordsTable td:nth-child(3) { width: 30%; }
+        #recordsTable th:nth-child(4),
+        #recordsTable td:nth-child(4) { width: 15%; text-align: center; }
+        #recordsTable th:nth-child(5),
+        #recordsTable td:nth-child(5) { width: 20%; text-align: right; }
+        #stopsTable th:nth-child(1),
+        #stopsTable td:nth-child(1) { width: 15%; }
+        #stopsTable th:nth-child(2),
+        #stopsTable td:nth-child(2) { width: 10%; text-align: center; }
+        #stopsTable th:nth-child(3),
+        #stopsTable td:nth-child(3) { width: 65%; }
+        #stopsTable th:nth-child(4),
+        #stopsTable td:nth-child(4) { width: 10%; text-align: center; }
+        #stopsTable th:nth-child(5),
+        #stopsTable td:nth-child(5) { width: 10%; text-align: center; }
+        #completedStopsTable th:nth-child(1),
+        #completedStopsTable td:nth-child(1) { width: 15%; }
+        #completedStopsTable th:nth-child(2),
+        #completedStopsTable td:nth-child(2) { width: 10%; text-align: center; }
+        #completedStopsTable th:nth-child(3),
+        #completedStopsTable td:nth-child(3) { width: 65%; }
+        #completedStopsTable th:nth-child(4),
+        #completedStopsTable td:nth-child(4) { width: 10%; text-align: center; }
+        #completedStopsTable th:nth-child(5),
+        #completedStopsTable td:nth-child(5) { width: 10%; text-align: center; }
+        .actions {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .edit-btn, .delete-btn, .add-btn, .photo-btn, #mapBtn, #voiceBtn {
+            padding: 6px 4px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+        .add-btn {
+            background-color: #008080;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .edit-btn {
+            background-color: #008080;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .photo-btn {
+            background-color: #ffc107;
+            font-size: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        #mapBtn, #voiceBtn {
+            background-color: #008080;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .observation-field {
+            width: 100%;
+            min-height: 30px;
+            box-sizing: border-box;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #000000; /* Alterado para preto */
+            border-radius: 5px;
+            padding: 8px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .filled-observation {
+            background-color: #4a2c2c;
+        }
+        .stop-row.completed {
+            background-color: #2a3a2a;
+            opacity: 0.8;
+            text-decoration: line-through;
+        }
+        .stop-row.completed td {
+            color: #a0a0a0;
+        }
+        .completed-checkbox {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .button-group button {
+            flex: 1;
+            min-width: 120px;
+        }
+        .hidden-file-input {
+            display: none;
+        }
+        .record-row {
+            cursor: pointer;
+        }
+        /* Estilos para os pop-ups customizados */
+        .custom-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .custom-popup {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .custom-popup-content {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4); /* Alteração: Sombra branca */
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .custom-popup-content h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.5em;
+        }
+        .custom-popup-content p {
+            font-size: 1.2em;
+            color: #e0e0e0;
+        }
+        .custom-popup-details {
+            text-align: left;
+            padding: 0 10px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .custom-popup-details h3, .custom-popup-details h4 {
+            color: #008080;
+            margin: 10px 0 5px;
+        }
+        .custom-popup-details p {
+            font-size: 1em;
+            margin: 5px 0;
+        }
+        .custom-popup-details .value {
+            color: #008080;
+            font-weight: bold;
+        }
+        .custom-popup-details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .custom-popup-details li {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+        }
+        .gains-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .gains-table th, .gains-table td {
+            padding: 8px;
+            border: 1px solid #444;
+            text-align: left;
+        }
+        .gains-table th {
+            background-color: #008080;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        .gains-table .week-total-row {
+            background-color: #008080;
+            font-weight: bold;
+            color: white;
+        }
+        .observation-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .observation-popup-content {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4); /* Alteração: Sombra branca */
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+        }
+        .observation-popup-content h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        .observation-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .observation-options button {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .observation-options button:hover {
+            background-color: #008080;
+        }
+        .observation-popup-content textarea,
+        .observation-popup-content input {
+            width: 100%;
+            min-height: 80px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #000000; /* Alterado para preto */
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .observation-popup-content input {
+            min-height: auto;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .observation-popup-actions {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .close-btn:hover {
+            background-color: #c82333;
+        }
+        .numeric-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            text-align: center;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #000000; /* Alterado para preto */
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .numeric-keyboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .numeric-keyboard button {
+            padding: 25px;
+            font-weight: bold;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .numeric-keyboard button:hover {
+            background-color: #008080;
+        }
+        .numeric-keyboard .numeric-key {
+            font-size: var(--keypad-font-size);
+        }
+        .alert-popup-content h3 {
+            color: #dc3545;
+        }
+        .alert-popup-content p {
+            font-size: 1.2em;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .alert-popup-content button {
+            background-color: #dc3545;
+            color: white;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        .alert-popup-content button:hover {
+            background-color: #c82333;
+        }
+        #gainsByMonthPopupOverlay {
+            text-align: left;
+        }
+        #gainsByMonthPopupContent h3 {
+            text-align: center;
+            color: #fff;
+        }
+        #gainsByMonthPopupContent table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #gainsByMonthPopupContent th,
+        #gainsByMonthPopupContent td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: left;
+            font-size: 1em;
+        }
+        #gainsByMonthPopupContent th {
+            background-color: #333;
+            color: white;
+        }
+        #gainsByMonthPopupContent td {
+            color: #e0e0e0;
+        }
+        #gainsByMonthPopupContent .gains-value-cell {
+            color: #008080;
+            font-weight: bold;
+        }
+        #gainsByMonthPopupContent button {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #008080;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* Alteração: Sombra branca */
+        }
+        #gainsByMonthPopupContent .gains-table td:nth-child(2) {
+            text-align: right;
+        }
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+        }
+        .setting-label {
+            font-size: 1.1em;
+            color: #e0e0e0;
+            white-space: nowrap;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #008080;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .font-size-value {
+            min-width: 30px;
+            text-align: right;
+        }
+        .last-cache-date {
+            font-style: italic;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        .gains-table th:last-child,
+        .gains-table td:last-child {
+            text-align: right;
+        }
+        #mapPopupOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1001;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #map {
+            width: 100%;
+            height: calc(100% - 60px);
+            border-radius: 10px;
+            border: 2px solid #008080;
+        }
+        #mapPopupOverlay .close-btn {
+            top: 20px;
+            right: 20px;
+            z-index: 1002;
+        }
+
+        .map-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        /* Marcadores do mapa personalizados com o número */
+        .leaflet-marker-icon.marker-div {
+            background: transparent;
+            border: none;
+        }
+
+        .marker-pin {
+            width: 30px;
+            height: 30px;
+            background-color: #dc3545; /* Cor padrão: vermelho (não entregue) */
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            font-size: 14px; /* Adicionado para garantir o tamanho da fonte */
+        }
+
+        .marker-pin.completed {
+            background-color: #008080; /* Cor para entregue: verde */
+        }
+
+        @media (max-width: 600px) {
+            .company-name { font-size: 1.4em; }
+            h1 { font-size: 1.2em; }
+            .total-container { font-size: 1em; padding: 8px; }
+            input, button { font-size: 14px; padding: 10px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+            #recordsTable th:nth-child(1), #recordsTable td:nth-child(1),
+            #recordsTable th:nth-child(2), #recordsTable td:nth-child(2),
+            #recordsTable th:nth-child(3), #recordsTable td:nth-child(3),
+            #recordsTable th:nth-child(4), #recordsTable td:nth-child(4),
+            #recordsTable th:nth-child(5), #recordsTable td:nth-child(5) { width: auto; }
+            #stopsTable th:nth-child(1), #stopsTable td:nth-child(1),
+            #stopsTable th:nth-child(2), #stopsTable td:nth-child(2),
+            #stopsTable th:nth-child(3), #stopsTable td:nth-child(3),
+            #stopsTable th:nth-child(4), #stopsTable td:nth-child(4),
+            #stopsTable th:nth-child(5), #stopsTable td:nth-child(5) { width: auto; }
+            #completedStopsTable th:nth-child(1), #completedStopsTable td:nth-child(1),
+            #completedStopsTable th:nth-child(2), #completedStopsTable td:nth-child(2),
+            #completedStopsTable th:nth-child(3), #completedStopsTable td:nth-child(3),
+            #completedStopsTable th:nth-child(4), #completedStopsTable td:nth-child(4),
+            #completedStopsTable th:nth-child(5), #completedStopsTable td:nth-child(5) { width: auto; }
+            .edit-btn, .delete-btn, .add-btn { padding: 4px 6px; font-size: 10px; }
+            .numeric-keyboard button {
+                padding: 15px;
+            }
+            .numeric-keyboard .numeric-key {
+                font-size: var(--keypad-font-size);
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <img src="IMG_20250816_204625.jpg" alt="Logo ML Deluna" class="top-logo">
+    <div class="container">
+        <h1>Registros</h1>
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('paradas', 0)">Paradas</button>
+            <button class="tab-button" onclick="openTab('pacotes', 1)">Pacotes</button>
+            <button class="tab-button" onclick="openTab('gains', 2)">Ganhos</button>
+        </div>
+        <div id="paradas" class="tab-content active">
+            <div class="form form-paradas">
+                <input type="text" id="stopNumber" placeholder="Número da Parada" readonly required>
+                <button id="voiceBtn" onclick="openVoiceInputPopup()">🎤</button>
+                <input type="text" id="quantity-paradas" placeholder="Quantidade de Pacotes" readonly required>
+                <button id="saveStopBtn" onclick="saveStopRecord()">Salvar Parada</button>
+            </div>
+            
+            <div class="total-container">
+                <div class="total-info">
+                    Quantidade total: <span id="totalStopsCount" class="total-value">0</span>
+                </div>
+                <div class="total-info">
+                    <button id="mapBtn" onclick="openMapPopup()">Mapa</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="stopsTable">
+                    <thead>
+                        <tr>
+                            <th>Parada</th>
+                            <th>QTD</th>
+                            <th>Observação</th>
+                            <th>Foto</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stopsTableBody"></tbody>
+                </table>
+            </div>
+
+            <hr style="margin-top: 20px; border-color: #444;">
+            <h2 style="text-align: center; color: #333;">Paradas Concluídas</h2>
+            <div class="table-container">
+                <table id="completedStopsTable">
+                    <thead>
+                        <tr>
+                            <th>Parada</th>
+                            <th>QTD</th>
+                            <th>Observação</th>
+                            <th>Foto</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedStopsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="pacotes" class="tab-content">
+            <div class="form">
+                <input type="date" id="date-pacotes" required>
+                <input type="text" id="quantity-pacotes" placeholder="Quantidade de Pacotes" readonly required>
+                <input type="text" id="route-pacotes" placeholder="Rota" required>
+                <input type="text" id="driver-pacotes" list="driver-list" placeholder="Nome do Motorista" required>
+                <datalist id="driver-list"></datalist>
+                <button id="addOrUpdateBtn" onclick="addOrUpdateRecord()">Adicionar</button>
+            </div>
+            <div id="editStopsContainer" class="button-group" style="display: none;">
+                <button onclick="editStops()">Editar Paradas</button>
+            </div>
+            <div class="button-group">
+                <button id="finishRouteBtn" onclick="finishRoute()">Finalizar Rota</button>
+            </div>
+            <div class="table-container">
+                <table id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Rota</th>
+                            <th>Motorista</th>
+                            <th>QTD</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="gains" class="tab-content">
+            <h2>Ganhos por Semana</h2>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <select id="month-filter">
+                    <option value="">Todos os Meses</option>
+                    <option value="0">Janeiro</option>
+                    <option value="1">Fevereiro</option>
+                    <option value="2">Março</option>
+                    <option value="3">Abril</option>
+                    <option value="4">Maio</option>
+                    <option value="5">Junho</option>
+                    <option value="6">Julho</option>
+                    <option value="7">Agosto</option>
+                    <option value="8">Setembro</option>
+                    <option value="9">Outubro</option>
+                    <option value="10">Novembro</option>
+                    <option value="11">Dezembro</option>
+                </select>
+                <select id="year-filter">
+                    <option value="">Todos os Anos</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table class="gains-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Pacotes</th>
+                            <th>Ganhos (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gainsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="routeDetails" class="tab-content">
+            <h2><span id="routeDetailsTitle"></span></h2>
+            <div class="total-container">
+                <div class="total-info">Total de pacotes: <span id="totalRouteDetailsCount" class="total-value">0</span></div>
+                <div class="total-info">Total de insucessos: <span id="totalInsucessoCount" class="total-value total-insucesso">0</span></div>
+            </div>
+            <div class="table-container">
+                <table id="detailsTable">
+                    <thead>
+                        <tr>
+                            <th>Parada</th>
+                            <th>QTD</th>
+                            <th>Observação</th>
+                            <th>Foto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routeDetailsTableBody"></tbody>
+                </table>
+            </div>
+            <button onclick="hideRouteDetails()">Voltar</button>
+        </div>
+        <div class="button-group" style="justify-content: center; margin-top: 20px;">
+            <button onclick="openSettingsPopup()">Configurações</button>
+        </div>
+    </div>
+    
+    <div id="customPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup">
+            <div class="custom-popup-content">
+                <h3 id="popupDate"></h3>
+                <p id="popupValue"></p>
+                <div class="button-group">
+                    <button onclick="closeCustomPopup()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gainsByMonthPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <div id="gainsByMonthPopupContent">
+                <h3 id="gainsPopupTitle"></h3>
+                <table class="gains-table">
+                    <thead>
+                        <tr>
+                            <th>Quinzena</th>
+                            <th>Ganhos (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gainsPopupTableBody">
+                        <tr>
+                            <td>1ª Quinzena</td>
+                            <td id="firstHalfGains" class="gains-value-cell"></td>
+                        </tr>
+                        <tr>
+                            <td>2ª Quinzena</td>
+                            <td id="secondHalfGains" class="gains-value-cell"></td>
+                        </tr>
+                        <tr>
+                            <td>Total do Mês</td>
+                            <td id="totalMonthGains" class="gains-value-cell"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button onclick="closeGainsPopup()">Fechar</button>
+        </div>
+    </div>
+
+    <div id="observationPopupOverlay" class="observation-popup">
+        <div class="observation-popup-content">
+            <h3>Observação da Parada</h3>
+            <input type="text" id="observationAddress" placeholder="Digite o Endereço">
+            <textarea id="observationTextarea" placeholder="Digite a observação"></textarea>
+            <div class="observation-options">
+                <button onclick="addObservationText('Mochila')">Mochila</button>
+                <button onclick="addObservationText('Grande')">Grande</button>
+            </div>
+            <div class="observation-popup-actions">
+                <button onclick="saveObservation()">Salvar</button>
+                <button onclick="closeObservationPopup()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="fullPhotoPopupOverlay" class="custom-popup-overlay" onclick="closeFullPhotoPopup()">
+        <div class="custom-popup-content" onclick="event.stopPropagation();">
+            <img id="fullPhoto" src="" style="max-width: 90vw; max-height: 90vh; object-fit: contain;">
+            <span class="close-btn" onclick="closeFullPhotoPopup();">X</span>
+        </div>
+    </div>
+
+    <div id="numericKeyboardPopup" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <h3 id="numericKeyboardTitle" style="color: #fff;">Digite o Número</h3>
+            <span class="close-btn" onclick="closeNumericKeyboard()">X</span>
+            <input type="text" id="numericInput" readonly class="numeric-input" value="0">
+            <div class="numeric-keyboard">
+                <button class="numeric-key" onclick="addNumericKey('1')">1</button>
+                <button class="numeric-key" onclick="addNumericKey('2')">2</button>
+                <button class="numeric-key" onclick="addNumericKey('3')">3</button>
+                <button class="numeric-key" onclick="addNumericKey('4')">4</button>
+                <button class="numeric-key" onclick="addNumericKey('5')">5</button>
+                <button class="numeric-key" onclick="addNumericKey('6')">6</button>
+                <button class="numeric-key" onclick="addNumericKey('7')">7</button>
+                <button class="numeric-key" onclick="addNumericKey('8')">8</button>
+                <button class="numeric-key" onclick="addNumericKey('9')">9</button>
+                <button onclick="clearNumericInput()" style="background-color: #dc3545;">Apagar</button>
+                <button class="numeric-key" onclick="addNumericKey('0')">0</button>
+                <button onclick="confirmNumericInput()" style="background-color: #008080;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content alert-popup-content">
+            <h3>Atenção!</h3>
+            <p id="alertMessage"></p>
+            <button onclick="closeAlertPopup()">OK</button>
+        </div>
+    </div>
+
+    <div id="settingsPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <h3>Configurações</h3>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <span class="setting-label">Tema Escuro/Claro</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Tamanho da Fonte do Teclado:</span>
+                    <select id="fontSizeSelect">
+                        <option value="15">15px</option>
+                        <option value="16">16px</option>
+                        <option value="17">17px</option>
+                        <option value="18">18px</option>
+                        <option value="19">19px</option>
+                        <option value="20">20px</option>
+                        <option value="21">21px</option>
+                        <option value="22">22px</option>
+                        <option value="23">23px</option>
+                        <option value="24">24px</option>
+                        <option value="25">25px</option>
+                        <option value="26">26px</option>
+                        <option value="27">27px</option>
+                        <option value="28">28px</option>
+                        <option value="29">29px</option>
+                        <option value="30">30px</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Dados:</span>
+                    <div class="button-group" style="width: 100%; margin-top: 10px;">
+                        <button onclick="exportData()">Exportar Dados</button>
+                        <button onclick="document.getElementById('file-input').click()">Importar Dados</button>
+                    </div>
+                    <input type="file" id="file-input" accept=".json" class="hidden-file-input" onchange="importData(event)">
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Manutenção:</span>
+                    <div class="button-group" style="width: 100%; margin-top: 10px;">
+                        <button onclick="clearCache()">Limpar Cache</button>
+                        <button onclick="clearServiceWorkerCache()">Limpar SW</button>
+                    </div>
+                </div>
+                <div class="setting-item" style="flex-direction: column; align-items: flex-start;">
+                    <span class="setting-label">Último Salvamento:</span>
+                    <span id="lastCacheDate" class="last-cache-date">Nenhum dado salvo.</span>
+                </div>
+            </div>
+            <button onclick="closeSettingsPopup()" style="margin-top: 20px;">Fechar</button>
+        </div>
+    </div>
+    
+    <div id="selectRoutePopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <h3>Selecione a Rota para Finalizar</h3>
+            <div id="activeRoutesList" style="text-align: left; margin-bottom: 20px;">
+            </div>
+            <button onclick="closeSelectRoutePopup()">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="mapPopupOverlay" class="custom-popup-overlay">
+        <span class="close-btn" onclick="closeMapPopup()">X</span>
+        <div id="map"></div>
+    </div>
+
+    <div id="voiceInputPopupOverlay" class="custom-popup-overlay">
+        <div class="custom-popup-content">
+            <h3>Entrada de Voz</h3>
+            <p id="voiceMessage">Pressione e segure o microfone para falar.</p>
+            <button id="microphoneBtn" style="font-size: 50px; padding: 10px; border-radius: 50%; width: 100px; height: 100px; background-color: #008080;" onmousedown="startListening()" onmouseup="stopListening()">🎤</button>
+            <p>Ou digite as informações:</p>
+            <input type="text" id="voiceAddress" placeholder="Endereço">
+            <input type="text" id="voiceStopNumber" placeholder="Parada">
+            <input type="text" id="voiceQuantity" placeholder="Quantidade">
+            <div class="button-group" style="margin-top: 20px;">
+                <button onclick="saveVoiceInput()">Confirmar</button>
+                <button onclick="closeVoiceInputPopup()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha20a-g204g/g204g"
+        crossorigin=""></script>
+    <script>
+        // Adicionado para PWA: Registrar o service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado com escopo:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Falha ao registrar o Service Worker:', error);
+                    });
+            });
+        }
+
+        // Variável global para rastrear a aba ativa
+        let currentTabIndex = 0;
+        const tabNames = ['paradas', 'pacotes', 'gains'];
+
+        function openTab(tabName, tabIndex) {
+            // Se a aba anterior era a de ganhos, resetamos o filtro de mês
+            if (tabNames[currentTabIndex] === 'gains') {
+                document.getElementById('month-filter').value = '';
+                document.getElementById('gainsTableBody').innerHTML = '';
+            }
+
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            
+            const button = document.querySelector(`.tab-button[onclick*="openTab('${tabName}')"]`);
+            if (button) {
+                button.classList.add('active');
+            }
+            
+            currentTabIndex = tabIndex;
+
+            if (tabName === 'gains') {
+                updateGainsTable();
+            }
+        }
+
+        let records = JSON.parse(localStorage.getItem('records')) || [];
+        let drivers = JSON.parse(localStorage.getItem('drivers')) || [];
+        let editIndex = -1;
+        const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = monthNames[date.getMonth()];
+            const dayOfWeek = dayNames[date.getDay()];
+            return `${day} ${month}<br>(${dayOfWeek})`;
+        }
+
+        function formatFullDate(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        if (drivers.length === 0) {
+            drivers = ['Wagner', 'Fabrício Junho', 'Luciane', 'Tiago', 'Apolo', 'Anselmo Soares', 'Felipe Ramos', 'Fábio Sousa', 'Marllon Y', 'Renato Salustiano', 'Jefferson cruz', 'ISAAC', 'Fábio Imbá', 'Renato Mattos', 'Juan Cavalcante', 'Felipe Quaresma', 'Emanoel', 'Tais', 'Jonathan vilar', 'William Rastelli', 'Mônica', 'Pablo Henrique', 'Douglas', 'Izael', 'Fabio silva', 'Fabiola', 'Francisco A', 'Lorran', 'Jonh Jonh', 'Marcos F', 'Matheus M', 'Ludimila', 'José', 'Felipe.A', 'ROGER P', 'MATEUS', 'Jhonatan', 'renan M', 'Leandro de Jesus', 'Pablo F', 'Daniel', 'ruth', 'Romarioooooo'];
+            localStorage.setItem('drivers', JSON.stringify(drivers));
+        }
+
+        function populateDriverDatalist() {
+            const driverList = document.getElementById('driver-list');
+            driverList.innerHTML = '';
+            const uniqueDrivers = [...new Set(drivers)].sort();
+            uniqueDrivers.forEach(driver => {
+                const option = document.createElement('option');
+                option.value = driver;
+                driverList.appendChild(option);
+            });
+        }
+
+        function loadRecords() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            const sortedRecords = records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            sortedRecords.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.classList.add('record-row');
+                row.onclick = () => showRouteDetails(record.date, record.route);
+                row.innerHTML = `
+                    <td>${formatDate(record.date)}</td>
+                    <td>${record.route || record.initials || ''}</td>
+                    <td>${record.driver}</td>
+                    <td><b>${record.quantity}</b></td>
+                    <td class="actions">
+                        <button class="add-btn" onclick="event.stopPropagation(); addQuantity(${index});">+</button>
+                        <button class="edit-btn" onclick="event.stopPropagation(); editRecord(${index});">E</button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteRecord(${index});">-</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            populateDriverDatalist();
+        }
+
+        function addOrUpdateRecord() {
+            const date = document.getElementById('date-pacotes').value;
+            const quantity = document.getElementById('quantity-pacotes').value;
+            const route = document.getElementById('route-pacotes').value;
+            const driver = document.getElementById('driver-pacotes').value;
+            if (!date || !quantity || !route || !driver) {
+                showAlert('Por favor, preencha todos os campos.');
+                return;
+            }
+            if (!drivers.includes(driver)) {
+                drivers.push(driver);
+                localStorage.setItem('drivers', JSON.stringify(drivers));
+                populateDriverDatalist();
+            }
+            const record = { date, quantity: Number(quantity), route, driver };
+            if (editIndex === -1) {
+                records.unshift(record);
+            } else {
+                const originalRecord = records[editIndex];
+                if (originalRecord.stopDetails) {
+                    record.stopDetails = originalRecord.stopDetails;
+                }
+                records[editIndex] = record;
+                editIndex = -1;
+            }
+            localStorage.setItem('records', JSON.stringify(records));
+            loadRecords();
+            clearFormPacotes();
+            document.getElementById('addOrUpdateBtn').textContent = 'Adicionar';
+            document.getElementById('editStopsContainer').style.display = 'none';
+            // Salva a data do último cache
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
+        }
+
+        function editRecord(index) {
+            const record = records[index];
+            document.getElementById('date-pacotes').value = record.date;
+            document.getElementById('quantity-pacotes').value = record.quantity;
+            document.getElementById('route-pacotes').value = record.route || record.initials || '';
+            document.getElementById('driver-pacotes').value = record.driver;
+            editIndex = index;
+            document.getElementById('addOrUpdateBtn').textContent = 'Atualizar';
+            document.getElementById('editStopsContainer').style.display = record.stopDetails ? 'flex' : 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function editStops() {
+            if (editIndex !== -1) {
+                const recordToEdit = records[editIndex];
+                if (recordToEdit.stopDetails) {
+                    if (stops.length > 0) {
+                        showAlert('Existe paradas não finalizadas. Por favor, termine de preencher a parada antes de editar outra rota.');
+                        return;
+                    }
+                    stops = recordToEdit.stopDetails.map(stop => ({
+                        stopNumber: stop.stopNumber,
+                        quantity: stop.quantity,
+                        completed: !stop.isFailed,
+                        observations: stop.observations,
+                        address: stop.address || '',
+                        photo: stop.photo || ''
+                    }));
+                    localStorage.setItem('stops', JSON.stringify(stops));
+                    loadStopRecords();
+                    openTab('paradas', 0);
+                    showAlert(`Dados da rota "${recordToEdit.route}" carregados na aba de paradas para edição.`);
+                    
+                    recordToEdit.quantity = 0;
+                    delete recordToEdit.stopDetails;
+                    localStorage.setItem('records', JSON.stringify(records));
+                    loadRecords();
+                    clearFormPacotes();
+                } else {
+                    showAlert('Esta rota não tem detalhes de paradas para editar.');
+                }
+            }
+        }
+
+        function addQuantity(index) {
+            const quantityToAdd = prompt("Quantos pacotes você deseja somar?");
+            if (quantityToAdd !== null && !isNaN(quantityToAdd) && quantityToAdd !== "") {
+                records[index].quantity = Number(records[index].quantity) + Number(quantityToAdd);
+                localStorage.setItem('records', JSON.stringify(records));
+                loadRecords();
+            } else if (quantityToAdd !== null) {
+                showAlert("Por favor, insira um número válido.");
+            }
+        }
+
+        function clearFormPacotes() {
+            document.getElementById('date-pacotes').value = '';
+            document.getElementById('quantity-pacotes').value = '';
+            document.getElementById('route-pacotes').value = '';
+            document.getElementById('driver-pacotes').value = '';
+        }
+
+        function deleteRecord(index) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                records.splice(index, 1);
+                localStorage.setItem('records', JSON.stringify(records));
+                loadRecords();
+            }
+        }
+
+        let stops = JSON.parse(localStorage.getItem('stops')) || [];
+        let editStopIndex = -1;
+        let currentObservationIndex = -1;
+
+        function saveStopRecord() {
+            const stopNumber = document.getElementById('stopNumber').value;
+            const quantity = document.getElementById('quantity-paradas').value;
+
+            if (!stopNumber || !quantity) {
+                showAlert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            const stopNumberExists = stops.some(stop => stop.stopNumber === Number(stopNumber) && stops.indexOf(stop) !== editStopIndex);
+            if (stopNumberExists) {
+                showAlert('Este número de parada já existe na lista. Por favor, edite a parada existente ou insira um novo número.');
+                return;
+            }
+
+            if (editStopIndex === -1) {
+                const record = { stopNumber: Number(stopNumber), quantity: Number(quantity), completed: false, observations: '', address: '', photo: '' };
+                stops.push(record);
+            } else {
+                stops[editStopIndex].stopNumber = Number(stopNumber);
+                stops[editStopIndex].quantity = Number(quantity);
+                editStopIndex = -1;
+                document.getElementById('saveStopBtn').textContent = 'Salvar Parada';
+            }
+            localStorage.setItem('stops', JSON.stringify(stops));
+            loadStopRecords();
+            clearFormParadas();
+            // Salva a data do último cache
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
+        }
+
+        function loadStopRecords() {
+            const activeTableBody = document.getElementById('stopsTableBody');
+            const completedTableBody = document.getElementById('completedStopsTableBody');
+
+            activeTableBody.innerHTML = '';
+            completedTableBody.innerHTML = '';
+
+            stops.sort((a, b) => a.stopNumber - b.stopNumber);
+
+            stops.forEach((stop, index) => {
+                const row = document.createElement('tr');
+                
+                const observationClass = stop.observations.trim() !== '' ? 'filled-observation' : '';
+                const photoCellContent = stop.photo 
+                    ? `<span style="cursor:pointer;" onclick="showFullPhoto('${stop.photo}')">📸</span>` 
+                    : 'N/A';
+                
+                row.innerHTML = `
+                    <td>${stop.stopNumber}</td>
+                    <td><b>${stop.quantity}</b></td>
+                    <td>
+                        <textarea class="observation-field ${observationClass}" readonly onclick="openObservationPopup(${index});">${stop.observations}</textarea>
+                    </td>
+                    <td style="text-align: center;">${photoCellContent}</td>
+                    <td class="actions">
+                        <input type="checkbox" class="completed-checkbox" ${stop.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleStopCompletion(${index});">
+                        <label for="photo-input-${index}" class="photo-btn">📷</label>
+                        <input type="file" id="photo-input-${index}" accept="image/*" capture="camera" class="hidden-file-input" onchange="handlePhotoCapture(${index}, event)">
+                        <button class="edit-btn" onclick="event.stopPropagation(); editStopRecord(${index});">E</button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteStopRecord(${index});">X</button>
+                    </td>
+                `;
+
+                if (stop.completed) {
+                    completedTableBody.appendChild(row);
+                } else {
+                    activeTableBody.appendChild(row);
+                }
+            });
+
+            const total = stops.reduce((sum, stop) => sum + (Number(stop.quantity) || 0), 0);
+            document.getElementById('totalStopsCount').textContent = total;
+        }
+
+
+        function handlePhotoCapture(index, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                stops[index].photo = reader.result;
+                localStorage.setItem('stops', JSON.stringify(stops));
+                loadStopRecords();
+                // Salva a data do último cache
+                localStorage.setItem('lastCacheDate', new Date().toISOString());
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openObservationPopup(index) {
+            currentObservationIndex = index;
+            const currentObservation = stops[index].observations;
+            const currentAddress = stops[index].address;
+            document.getElementById('observationTextarea').value = currentObservation;
+            document.getElementById('observationAddress').value = currentAddress;
+            document.getElementById('observationPopupOverlay').style.display = 'flex';
+        }
+
+        function closeObservationPopup() {
+            document.getElementById('observationPopupOverlay').style.display = 'none';
+        }
+
+        function addObservationText(text) {
+            const textarea = document.getElementById('observationTextarea');
+            const currentValue = textarea.value;
+            if (currentValue.includes(text)) {
+                const updatedValue = currentValue.split(', ').filter(t => t !== text).join(', ');
+                textarea.value = updatedValue;
+            } else {
+                textarea.value = currentValue ? `${currentValue}, ${text}` : text;
+            }
+        }
+
+        function saveObservation() {
+            const newObservation = document.getElementById('observationTextarea').value;
+            const newAddress = document.getElementById('observationAddress').value;
+            if (currentObservationIndex !== -1) {
+                stops[currentObservationIndex].observations = newObservation;
+                stops[currentObservationIndex].address = newAddress;
+                localStorage.setItem('stops', JSON.stringify(stops));
+                loadStopRecords();
+                localStorage.setItem('lastCacheDate', new Date().toISOString());
+            }
+            closeObservationPopup();
+        }
+
+        function toggleStopCompletion(index) {
+            stops[index].completed = !stops[index].completed;
+            localStorage.setItem('stops', JSON.stringify(stops));
+            loadStopRecords();
+        }
+
+        function updateObservation(index, value) {
+            stops[index].observations = value;
+            localStorage.setItem('stops', JSON.stringify(stops));
+        }
+
+        function editStopRecord(index) {
+            const record = stops[index];
+            document.getElementById('stopNumber').value = record.stopNumber;
+            document.getElementById('quantity-paradas').value = record.quantity;
+            editStopIndex = index;
+            document.getElementById('saveStopBtn').textContent = 'Salvar Parada';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearFormParadas() {
+            document.getElementById('stopNumber').value = '';
+            document.getElementById('quantity-paradas').value = '';
+        }
+
+        function deleteStopRecord(index) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                stops.splice(index, 1);
+                localStorage.setItem('stops', JSON.stringify(stops));
+                loadStopRecords();
+            }
+        }
+
+        function finishRoute() {
+            const activeRoutes = records.filter(rec => !rec.stopDetails);
+
+            if (activeRoutes.length === 0) {
+                showAlert('Não há rotas ativas para finalizar.');
+                return;
+            }
+
+            const activeRoutesList = document.getElementById('activeRoutesList');
+            activeRoutesList.innerHTML = '';
+            
+            activeRoutes.forEach(route => {
+                const button = document.createElement('button');
+                button.textContent = `${route.route} (${route.driver}) - ${formatFullDate(route.date)}`;
+                button.style.marginBottom = '10px';
+                button.style.width = '100%';
+                button.onclick = () => confirmAndSaveRoute(route.date, route.route);
+                activeRoutesList.appendChild(button);
+            });
+
+            document.getElementById('selectRoutePopupOverlay').style.display = 'flex';
+        }
+        
+        function closeSelectRoutePopup() {
+            document.getElementById('selectRoutePopupOverlay').style.display = 'none';
+        }
+
+        function confirmAndSaveRoute(date, routeName) {
+            if (stops.length === 0) {
+                showAlert('Não há paradas para finalizar.');
+                return;
+            }
+
+            const recordToUpdate = records.find(rec => rec.date === date && rec.route === routeName);
+
+            if (!recordToUpdate) {
+                showAlert('Rota não encontrada. Verifique se o nome e a data estão corretos.');
+                return;
+            }
+
+            let totalPackagesInStops = 0;
+            recordToUpdate.stopDetails = stops.map(stop => {
+                totalPackagesInStops += Number(stop.quantity) || 0;
+                const isFailed = !stop.completed || (stop.observations && stop.observations.toLowerCase().includes('insuc'));
+                return {
+                    stopNumber: stop.stopNumber,
+                    quantity: stop.quantity,
+                    observations: stop.observations,
+                    address: stop.address || '',
+                    isFailed: isFailed,
+                    photo: stop.photo
+                };
+            });
+            recordToUpdate.quantity = totalPackagesInStops;
+            localStorage.setItem('records', JSON.stringify(records));
+
+            stops = [];
+            localStorage.setItem('stops', JSON.stringify(stops));
+            
+            loadRecords();
+            loadStopRecords();
+            
+            closeSelectRoutePopup();
+            showAlert(`A rota "${routeName}" foi finalizada e os dados de paradas foram salvos.`);
+            localStorage.setItem('lastCacheDate', new Date().toISOString());
+        }
+
+        function showRouteDetails(date, route) {
+            openTab('routeDetails', -1);
+            const record = records.find(rec => rec.date === date && rec.route === route);
+            document.getElementById('routeDetailsTitle').textContent = `${formatFullDate(record.date)} - Rota: ${record.route}`;
+            const detailsTableBody = document.getElementById('routeDetailsTableBody');
+            detailsTableBody.innerHTML = '';
+            let totalPackagesInStops = 0;
+            let failedCount = 0;
+            if (record.stopDetails && record.stopDetails.length > 0) {
+                record.stopDetails.forEach(stop => {
+                    const row = document.createElement('tr');
+                    totalPackagesInStops += Number(stop.quantity) || 0;
+                    if (stop.isFailed) {
+                        failedCount++;
+                        row.style.backgroundColor = 'rgba(220, 53, 69, 0.2)';
+                    }
+                    const photoCellContent = stop.photo 
+                        ? `<span style="cursor:pointer;" onclick="showFullPhoto('${stop.photo}')">📸</span>` 
+                        : 'N/A';
+                    row.innerHTML = `
+                        <td>${stop.stopNumber}</td>
+                        <td>${stop.quantity}</td>
+                        <td>${stop.observations || 'N/A'}</td>
+                        <td style="text-align: center;">${photoCellContent}</td>
+                    `;
+                    detailsTableBody.appendChild(row);
+                });
+            } else if (record.observations) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>${record.observations}</td>
+                    <td style="text-align: center;">N/A</td>
+                `;
+                detailsTableBody.appendChild(row);
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="4">Nenhum detalhe de parada para esta rota.</td>`;
+                detailsTableBody.appendChild(row);
+            }
+            document.getElementById('totalRouteDetailsCount').textContent = totalPackagesInStops;
+            document.getElementById('totalInsucessoCount').textContent = failedCount;
+        }
+
+        function hideRouteDetails() {
+            openTab('pacotes', 1);
+        }
+
+        function exportData() {
+            const data = {
+                records: records,
+                stops: stops,
+                drivers: drivers
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dados_deluna.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.records && importedData.stops && importedData.drivers) {
+                        records = importedData.records;
+                        stops = importedData.stops;
+                        drivers = importedData.drivers;
+                        localStorage.setItem('records', JSON.stringify(records));
+                        localStorage.setItem('stops', JSON.stringify(stops));
+                        localStorage.setItem('drivers', JSON.stringify(drivers));
+                        loadRecords();
+                        loadStopRecords();
+                        showAlert('Dados importados com sucesso!');
+                        localStorage.setItem('lastCacheDate', new Date().toISOString());
+                    } else {
+                        showAlert('Formato de arquivo JSON inválido. Por favor, selecione um arquivo válido.');
+                    }
+                } catch (error) {
+                    showAlert('Erro ao processar o arquivo. Certifique-se de que é um arquivo JSON válido.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function showCustomPopup(date, value) {
+            document.getElementById('popupDate').textContent = `Data: ${date}`;
+            document.getElementById('popupValue').textContent = `R$ ${value}`;
+            document.getElementById('customPopupOverlay').style.display = 'flex';
+        }
+
+        function closeCustomPopup() {
+            document.getElementById('customPopupOverlay').style.display = 'none';
+        }
+
+        function openGainsPopup() {
+            document.getElementById('gainsByMonthPopupOverlay').style.display = 'flex';
+        }
+
+        function closeGainsPopup() {
+            document.getElementById('gainsByMonthPopupOverlay').style.display = 'none';
+        }
+
+        function getWeekStartDate(date) {
+            const d = new Date(date + 'T00:00:00');
+            const dayOfWeek = d.getDay();
+            const diff = d.getDate() - dayOfWeek;
+            return new Date(d.setDate(diff)).toISOString().slice(0, 10);
+        }
+        
+        function updateGainsTable() {
+            const tableBody = document.getElementById('gainsTableBody');
+            tableBody.innerHTML = '';
+            
+            const selectedMonth = document.getElementById('month-filter').value;
+            const selectedYear = document.getElementById('year-filter').value;
+            
+            const yearFilter = document.getElementById('year-filter');
+            if (yearFilter.options.length <= 1) {
+                const uniqueYears = [...new Set(records.map(r => new Date(r.date).getFullYear()))].sort((a, b) => b - a);
+                uniqueYears.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearFilter.appendChild(option);
+                });
+                yearFilter.value = new Date().getFullYear();
+            }
+
+            const dailyTotals = {};
+
+            records.forEach(record => {
+                const recordDate = new Date(record.date + 'T00:00:00');
+                const recordMonth = recordDate.getMonth();
+                const recordYear = recordDate.getFullYear();
+                
+                const monthMatch = selectedMonth === '' || recordMonth === parseInt(selectedMonth);
+                const yearMatch = selectedYear === '' || recordYear === parseInt(selectedYear);
+
+                if (monthMatch && yearMatch) {
+                    if (!dailyTotals[record.date]) {
+                        dailyTotals[record.date] = { packages: 0, gains: 0 };
+                    }
+                    const packages = record.quantity;
+                    const gains = packages * 2.50;
+                    dailyTotals[record.date].packages += packages;
+                    dailyTotals[record.date].gains += gains;
+                }
+            });
+
+            if (selectedMonth !== '' && selectedYear !== '') {
+                showGainsByMonthPopup(selectedMonth, selectedYear, dailyTotals);
+            } else {
+                closeGainsPopup();
+            }
+
+            const weeklyGains = {};
+            Object.keys(dailyTotals).forEach(dateString => {
+                const weekKey = getWeekStartDate(dateString);
+                
+                if (!weeklyGains[weekKey]) {
+                    weeklyGains[weekKey] = { total: 0, days: [] };
+                }
+                
+                weeklyGains[weekKey].total += dailyTotals[dateString].gains;
+                weeklyGains[weekKey].days.push({ 
+                    date: dateString, 
+                    packages: dailyTotals[dateString].packages, 
+                    gains: dailyTotals[dateString].gains 
+                });
+            });
+            
+            const sortedWeeks = Object.keys(weeklyGains).sort((a, b) => new Date(b) - new Date(a));
+            
+            sortedWeeks.forEach(weekKey => {
+                const weekData = weeklyGains[weekKey];
+                
+                weekData.days.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(day => {
+                    const dayRow = document.createElement('tr');
+                    dayRow.innerHTML = `
+                        <td>${formatDate(day.date)}</td>
+                        <td><b>${day.packages}</b></td>
+                        <td class="gains-value-cell"><b>R$ ${day.gains.toFixed(2).replace('.', ',')}</b></td>
+                    `;
+                    tableBody.appendChild(dayRow);
+                });
+                
+                const totalRow = document.createElement('tr');
+                totalRow.classList.add('week-total-row');
+                totalRow.innerHTML = `
+                    <td>Total da Semana</td>
+                    <td></td>
+                    <td><b>R$ ${weekData.total.toFixed(2).replace('.', ',')}</b></td>
+                `;
+                tableBody.appendChild(totalRow);
+            });
+        }
+
+        function showGainsByMonthPopup(monthIndex, year, dailyTotals) {
+            const monthName = document.querySelector(`#month-filter option[value='${monthIndex}']`).textContent;
+            document.getElementById('gainsPopupTitle').textContent = `Ganhos em ${monthName} de ${year}`;
+            
+            let firstHalfGains = 0;
+            let secondHalfGains = 0;
+            let totalMonthGains = 0;
+
+            Object.keys(dailyTotals).forEach(dateString => {
+                const day = new Date(dateString + 'T00:00:00').getDate();
+                const gains = dailyTotals[dateString].gains;
+                
+                if (day <= 15) {
+                    firstHalfGains += gains;
+                } else {
+                    secondHalfGains += gains;
+                }
+                totalMonthGains += gains;
+            });
+
+            document.getElementById('firstHalfGains').textContent = `R$ ${firstHalfGains.toFixed(2).replace('.', ',')}`;
+            document.getElementById('secondHalfGains').textContent = `R$ ${secondHalfGains.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalMonthGains').textContent = `R$ ${totalMonthGains.toFixed(2).replace('.', ',')}`;
+
+            openGainsPopup();
+        }
+
+        // Funções para o teclado numérico
+        let currentNumericValue = '';
+        let currentInputField = '';
+
+        function openNumericKeyboard(fieldId) {
+            currentInputField = fieldId;
+            currentNumericValue = document.getElementById(fieldId).value || '0';
+            document.getElementById('numericInput').value = currentNumericValue;
+            document.getElementById('numericKeyboardTitle').textContent = fieldId === 'stopNumber' ? 'Digite o Número da Parada' : 'Digite a Quantidade';
+            document.getElementById('numericKeyboardPopup').style.display = 'flex';
+        }
+
+        function addNumericKey(key) {
+            currentNumericValue = currentNumericValue === '0' ? key : currentNumericValue + key;
+            document.getElementById('numericInput').value = currentNumericValue;
+        }
+
+        function clearNumericInput() {
+            currentNumericValue = '0';
+            document.getElementById('numericInput').value = currentNumericValue;
+        }
+
+        function confirmNumericInput() {
+            const value = parseInt(currentNumericValue);
+            if (value < 0 || isNaN(value)) {
+                showAlert('Por favor, insira um número válido.');
+                return;
+            }
+            document.getElementById(currentInputField).value = value;
+            
+            if (currentInputField === 'stopNumber') {
+                openNumericKeyboard('quantity-paradas');
+            } else if (currentInputField === 'quantity-paradas') {
+                saveStopRecord();
+                closeNumericKeyboard();
+                document.getElementById('stopNumber').focus();
+            } else if (currentInputField === 'quantity-pacotes') {
+                closeNumericKeyboard();
+            }
+        }
+
+        function closeNumericKeyboard() {
+            document.getElementById('numericKeyboardPopup').style.display = 'none';
+            currentInputField = '';
+        }
+
+        let touchstartX = 0;
+        let touchendX = 0;
+        const swipeZone = document.querySelector('.container');
+        
+        swipeZone.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        });
+
+        swipeZone.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        });
+
+        function handleGesture() {
+            const swipeDistance = touchendX - touchstartX;
+            const swipeThreshold = 75;
+
+            if (swipeDistance < -swipeThreshold) {
+                const nextIndex = (currentTabIndex + 1) % tabNames.length;
+                openTab(tabNames[nextIndex], nextIndex);
+            }
+            
+            if (swipeDistance > swipeThreshold) {
+                const prevIndex = (currentTabIndex - 1 + tabNames.length) % tabNames.length;
+                openTab(tabNames[prevIndex], prevIndex);
+            }
+        }
+        
+        function showFullPhoto(base64Image) {
+            document.getElementById('fullPhoto').src = base64Image;
+            document.getElementById('fullPhotoPopupOverlay').style.display = 'flex';
+        }
+
+        function closeFullPhotoPopup() {
+            document.getElementById('fullPhotoPopupOverlay').style.display = 'none';
+        }
+
+        // Funções para o pop-up de alerta customizado
+        function showAlert(message) {
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('alertPopupOverlay').style.display = 'flex';
+        }
+
+        function closeAlertPopup() {
+            document.getElementById('alertPopupOverlay').style.display = 'none';
+        }
+        
+        // Função para limpar o cache (localStorage)
+        function clearCache() {
+            if (confirm('Tem certeza que deseja apagar TODOS os dados salvos localmente (registros, paradas and motoristas)?')) {
+                localStorage.clear();
+                alert('Cache limpo com sucesso! A página será recarregada.');
+                location.reload();
+            }
+        }
+
+        // Função para limpar o cache do Service Worker
+        function clearServiceWorkerCache() {
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        return caches.delete(cacheName);
+                    })
+                );
+            }).then(() => {
+                alert('Cache do Service Worker limpo com sucesso!');
+            }).catch(error => {
+                console.error('Falha ao limpar o cache do Service Worker:', error);
+            });
+        }
+
+       // Funções para o novo pop-up de configurações
+        function openSettingsPopup() {
+            const lastCacheDate = localStorage.getItem('lastCacheDate');
+            document.getElementById('lastCacheDate').textContent = lastCacheDate 
+                ? `Último salvamento: ${new Date(lastCacheDate).toLocaleString('pt-BR')}` 
+                : 'Nenhum dado salvo.';
+            document.getElementById('settingsPopupOverlay').style.display = 'flex';
+            
+            // Carregar configurações de tema
+            const isDarkTheme = document.body.classList.contains('dark-theme');
+            document.getElementById('theme-toggle').checked = isDarkTheme;
+            
+            // Carregar tamanho da fonte salvo
+            const savedFontSize = localStorage.getItem('keypadFontSize') || '24';
+            document.getElementById('fontSizeSelect').value = savedFontSize;
+            document.documentElement.style.setProperty('--keypad-font-size', `${savedFontSize}px`);
+        }
+
+        function closeSettingsPopup() {
+            document.getElementById('settingsPopupOverlay').style.display = 'none';
+        }
+
+        // Função para alternar tema claro/escuro
+        document.getElementById('theme-toggle').addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.remove('light-theme');
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Função para atualizar o tamanho da fonte do teclado numérico
+        document.getElementById('fontSizeSelect').addEventListener('change', function() {
+            const fontSize = this.value;
+            document.documentElement.style.setProperty('--keypad-font-size', `${fontSize}px`);
+            localStorage.setItem('keypadFontSize', fontSize);
+        });
+
+        // Funções do mapa
+        let myMap = null;
+        let myLocationMarker = null;
+
+        function openMapPopup() {
+            if (stops.length === 0) {
+                showAlert('Não há paradas para exibir no mapa.');
+                return;
+            }
+            document.getElementById('mapPopupOverlay').style.display = 'flex';
+            if (myMap) {
+                myMap.remove();
+            }
+            createMap();
+        }
+
+        function closeMapPopup() {
+            if (myMap) {
+                myMap.remove();
+                myMap = null;
+                myLocationMarker = null;
+            }
+            document.getElementById('mapPopupOverlay').style.display = 'none';
+        }
+        
+        // Nova função para confirmar a entrega no mapa
+        function confirmDeliveryFromMap(stopNumber) {
+            const stopIndex = stops.findIndex(stop => stop.stopNumber === stopNumber);
+            if (stopIndex !== -1) {
+                stops[stopIndex].completed = true;
+                localStorage.setItem('stops', JSON.stringify(stops));
+                loadStopRecords();
+                
+                // Atualiza o ícone do marcador no mapa após a entrega
+                const completedIcon = L.divIcon({
+                    className: 'marker-div',
+                    html: `<div class="marker-pin completed">${stopNumber}</div>`,
+                    iconSize: [30, 42],
+                    iconAnchor: [15, 42]
+                });
+
+                myMap.eachLayer(layer => {
+                    if (layer instanceof L.Marker && layer.getPopup()._content.includes(`Parada: ${stopNumber}`)) {
+                        layer.setIcon(completedIcon);
+                        // Atualiza o conteúdo do popup para refletir a mudança
+                        layer.setPopupContent(`
+                            <b>${stops[stopIndex].address.split(',')[0].trim()}</b><br>
+                            Parada: ${stopNumber}<br>
+                            Pacotes: ${stops[stopIndex].quantity}<br>
+                            Observação: ${stops[stopIndex].observations || 'N/A'}<br>
+                            <br>
+                            <span style="color: green; font-weight: bold;">Entrega Concluída</span>
+                        `);
+                    }
+                });
+            }
+        }
+        
+        async function createMap() {
+            myMap = L.map('map').setView([-22.9068, -43.1729], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(myMap);
+
+            const geocodeAddress = async (address) => {
+                if (!address) return null;
+                // Adiciona "Centro, Rio de Janeiro, Brasil" para otimizar a pesquisa
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ', Centro, Rio de Janeiro, Brasil')}`);
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    return [data[0].lat, data[0].lon];
+                }
+                return null;
+            };
+
+            const bounds = [];
+            const markers = [];
+
+            for (const stop of stops) {
+                if (stop.address) {
+                    const coords = await geocodeAddress(stop.address);
+                    if (coords) {
+                        // Cria o ícone com o número da parada
+                        const customIcon = L.divIcon({
+                            className: 'marker-div',
+                            html: `<div class="marker-pin ${stop.completed ? 'completed' : ''}">${stop.stopNumber}</div>`,
+                            iconSize: [30, 42],
+                            iconAnchor: [15, 42]
+                        });
+                        
+                        const popupContent = `
+                            <b>${stop.address.split(',')[0].trim()}</b><br>
+                            Parada: ${stop.stopNumber}<br>
+                            Pacotes: ${stop.quantity}<br>
+                            Observação: ${stop.observations || 'N/A'}<br>
+                            <br>
+                            ${stop.completed ? '<span style="color: green; font-weight: bold;">Entrega Concluída</span>' : `<button onclick="confirmDeliveryFromMap(${stop.stopNumber})">Confirmar Entrega</button>`}
+                        `;
+                        
+                        const marker = L.marker(coords, { icon: customIcon }).addTo(myMap)
+                            .bindPopup(popupContent);
+                        markers.push(marker);
+                        bounds.push(coords);
+                    }
+                }
+            }
+
+            if (bounds.length > 0) {
+                myMap.fitBounds(bounds, { padding: [50, 50] });
+            }
+
+            if ('geolocation' in navigator) {
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        const latlng = [position.coords.latitude, position.coords.longitude];
+                        if (myLocationMarker) {
+                            myLocationMarker.setLatLng(latlng);
+                        } else {
+                            myLocationMarker = L.marker(latlng).addTo(myMap)
+                                .bindPopup('Sua Posição Atual').openPopup();
+                        }
+                    },
+                    (error) => {
+                        console.error('Erro de geolocalização:', error);
+                    },
+                    {
+                        enableHighAccuracy: true
+                    }
+                );
+            } else {
+                showAlert('Geolocalização não é suportada pelo seu navegador.');
+            }
+        }
+        
+        // Variáveis globais para o reconhecimento de voz
+        let recognition = null;
+        let isListening = false;
+        
+        // Dicionário para converter números por extenso
+        const numberWords = {
+            'zero': 0, 'um': 1, 'uma': 1, 'dois': 2, 'duas': 2, 'três': 3, 'quatro': 4, 'cinco': 5,
+            'seis': 6, 'sete': 7, 'oito': 8, 'nove': 9, 'dez': 10, 'onze': 11, 'doze': 12, 'treze': 13,
+            'catorze': 14, 'quinze': 15, 'dezesseis': 16, 'dezessete': 17, 'dezoito': 18, 'dezenove': 19,
+            'vinte': 20, 'trinta': 30, 'quarenta': 40, 'cinquenta': 50, 'sessenta': 60, 'setenta': 70,
+            'oitenta': 80, 'noventa': 90, 'cem': 100
+        };
+
+        // Função para abrir o pop-up de entrada de voz
+        function openVoiceInputPopup() {
+            document.getElementById('voiceInputPopupOverlay').style.display = 'flex';
+            document.getElementById('voiceMessage').textContent = 'Pressione e segure o microfone para falar.';
+            document.getElementById('voiceAddress').value = '';
+            document.getElementById('voiceStopNumber').value = '';
+            document.getElementById('voiceQuantity').value = '';
+
+            // Verifica se a API de reconhecimento de voz é suportada
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'pt-BR';
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    document.getElementById('voiceMessage').textContent = 'Ouvindo...';
+                    document.getElementById('microphoneBtn').style.backgroundColor = '#dc3545';
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    processVoiceInput(transcript);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Erro de reconhecimento de voz:', event.error);
+                    document.getElementById('voiceMessage').textContent = 'Erro ao ouvir. Tente novamente.';
+                    document.getElementById('microphoneBtn').style.backgroundColor = '#008080';
+                    isListening = false;
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    document.getElementById('voiceMessage').textContent = 'Processando...';
+                    document.getElementById('microphoneBtn').style.backgroundColor = '#008080';
+                };
+            } else {
+                document.getElementById('voiceMessage').textContent = 'Reconhecimento de voz não suportado neste navegador. Por favor, digite os dados.';
+                document.getElementById('microphoneBtn').style.display = 'none';
+            }
+        }
+
+        // Inicia o reconhecimento ao pressionar o botão
+        function startListening() {
+            if (recognition && !isListening) {
+                recognition.start();
+            }
+        }
+
+        // Para o reconhecimento ao soltar o botão
+        function stopListening() {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        }
+
+        // Processa o texto transcrito
+        function processVoiceInput(text) {
+            const addressInput = document.getElementById('voiceAddress');
+            const stopNumberInput = document.getElementById('voiceStopNumber');
+            const quantityInput = document.getElementById('voiceQuantity');
+            
+            let stopNumber = '';
+            let quantity = '';
+            let address = text;
+
+            // Converter a frase para minúsculas
+            const normalizedText = text.toLowerCase();
+
+            // Tentar extrair o número da parada e a quantidade
+            const parts = normalizedText.split(' ');
+            let tempParts = [...parts];
+
+            // 1. Procurar por "parada"
+            const paradaIndex = tempParts.indexOf('parada');
+            if (paradaIndex !== -1 && tempParts.length > paradaIndex + 1) {
+                let nextWord = tempParts[paradaIndex + 1].replace(',', '');
+                if (!isNaN(parseInt(nextWord))) {
+                    stopNumber = parseInt(nextWord);
+                } else if (numberWords[nextWord]) {
+                    stopNumber = numberWords[nextWord];
+                }
+                tempParts.splice(paradaIndex, 2);
+            }
+
+            // 2. Procurar por "pacote" ou "pacotes"
+            const pacoteIndex = tempParts.findIndex(p => p.includes('pacote'));
+            if (pacoteIndex !== -1 && pacoteIndex > 0) {
+                let prevWord = tempParts[pacoteIndex - 1].replace(',', '');
+                if (!isNaN(parseInt(prevWord))) {
+                    quantity = parseInt(prevWord);
+                } else if (numberWords[prevWord]) {
+                    quantity = numberWords[prevWord];
+                }
+                tempParts.splice(pacoteIndex - 1, 2);
+            }
+
+            // O resto é o endereço
+            address = tempParts.join(' ');
+            
+            // Corrige a capitalização do endereço
+            const words = address.split(' ').map(word => {
+                if (word.length > 0) {
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                return word;
+            });
+            address = words.join(' ');
+
+            addressInput.value = address.trim();
+            stopNumberInput.value = stopNumber;
+            quantityInput.value = quantity;
+            
+            document.getElementById('voiceMessage').textContent = 'Informações extraídas. Verifique e confirme.';
+        }
+
+        // Salva os dados do pop-up de voz
+        function saveVoiceInput() {
+            const stopNumber = document.getElementById('voiceStopNumber').value;
+            const quantity = document.getElementById('voiceQuantity').value;
+            const address = document.getElementById('voiceAddress').value;
+
+            if (!stopNumber || !quantity) {
+                showAlert('Número da parada e quantidade são obrigatórios.');
+                return;
+            }
+
+            // Preenche os campos principais da aba de Paradas
+            document.getElementById('stopNumber').value = stopNumber;
+            document.getElementById('quantity-paradas').value = quantity;
+
+            // Encontra ou cria a parada e adiciona o endereço
+            const stopIndex = stops.findIndex(s => s.stopNumber == stopNumber);
+            if (stopIndex !== -1) {
+                stops[stopIndex].address = address;
+                stops[stopIndex].quantity = Number(quantity);
+            } else {
+                const newStop = { stopNumber: Number(stopNumber), quantity: Number(quantity), completed: false, observations: '', address: address, photo: '' };
+                stops.push(newStop);
+            }
+            
+            localStorage.setItem('stops', JSON.stringify(stops));
+            loadStopRecords();
+            closeVoiceInputPopup();
+            showAlert('Dados de endereço, parada e quantidade preenchidos com sucesso!');
+        }
+
+        // Fecha o pop-up de entrada de voz
+        function closeVoiceInputPopup() {
+            document.getElementById('voiceInputPopupOverlay').style.display = 'none';
+        }
+        
+        // Carregar tema salvo ao iniciar
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.classList.add(`${savedTheme}-theme`);
+            document.getElementById('theme-toggle').checked = savedTheme === 'dark';
+            
+            // Carregar tamanho da fonte salvo
+            const savedFontSize = localStorage.getItem('keypadFontSize') || '24';
+            document.documentElement.style.setProperty('--keypad-font-size', `${savedFontSize}px`);
+            document.getElementById('fontSizeSelect').value = savedFontSize;
+            
+            // Carregar dados iniciais
+            loadRecords();
+            loadStopRecords();
+        });
+
+        // Adicionar eventos de clique para abrir o teclado numérico
+        document.getElementById('stopNumber').addEventListener('click', () => openNumericKeyboard('stopNumber'));
+        document.getElementById('quantity-paradas').addEventListener('click', () => openNumericKeyboard('quantity-paradas'));
+        document.getElementById('quantity-pacotes').addEventListener('click', () => openNumericKeyboard('quantity-pacotes'));
+
+        // Atualizar a tabela de ganhos ao mudar o filtro de mês ou ano
+        document.getElementById('month-filter').addEventListener('change', updateGainsTable);
+        document.getElementById('year-filter').addEventListener('change', updateGainsTable);
+
+        // Função para inicializar a data padrão no campo de data da aba Pacotes
+        document.getElementById('date-pacotes').value = new Date().toLocaleDateString('en-CA');
+
+        // Garantir que a aba inicial seja carregada corretamente
+        openTab('paradas', 0);
+    </script>
+</body>
+</html>
